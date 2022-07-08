@@ -8,8 +8,9 @@ ROOTDIR="`dirname \"$0\"`"
 ROOTDIR="`readlink -f ${ROOTDIR}`"  # this is the directory that contains this script
 BASE_IMAGE="nvcr.io_nvidia_pytorch_22.02-py3.sqsh"
 ENROOT_DIR="/netscratch/enroot"
-srun --container-image=$ENROOT_DIR/$BASE_IMAGE \
+USER_IMAGES_DIR="$NETSCRATCH/docker_images"
+srun --container-image=$USER_IMAGES_DIR/$BASE_IMAGE \  # $ENROOT_DIR
   --container-workdir="`pwd`" \
   --container-mounts=$NETSCRATCH:$NETSCRATCH,/ds:/ds:ro,"`pwd`":"`pwd`" \
-  --container-save=$NETSCRATCH/docker_images/$BASE_IMAGE \
-  ./env.sh && pip3 install -r --no-cache-dir requirements.txt && python germanQuAD_train.py
+#  --container-save=$USER_IMAGES_DIR/$BASE_IMAGE \
+  ./env.sh && pip3 --no-cache-dir install -r requirements.txt && python germanQuAD_train.py
