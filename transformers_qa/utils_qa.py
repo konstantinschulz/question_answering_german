@@ -22,6 +22,7 @@ import os
 from typing import Optional, Tuple
 
 import numpy as np
+from datasets import Dataset
 from tqdm.auto import tqdm
 
 
@@ -39,6 +40,7 @@ def postprocess_qa_predictions(
     output_dir: Optional[str] = None,
     prefix: Optional[str] = None,
     log_level: Optional[int] = logging.WARNING,
+    hf_data: Dataset = None
 ):
     """
     Post-processes the predictions of a question-answering model to convert them to answers that are substrings of the
@@ -72,6 +74,8 @@ def postprocess_qa_predictions(
             If provided, the dictionaries mentioned above are saved with `prefix` added to their names.
         log_level (:obj:`int`, `optional`, defaults to ``logging.WARNING``):
             ``logging`` log level (e.g., ``logging.WARNING``)
+        hf_data (:obj:`datasets.Dataset`, `optional`):
+            The original dataset from Huggingface.
     """
     if len(predictions) != 2:
         raise ValueError("`predictions` should be a tuple with two elements (start_logits, end_logits).")
@@ -175,7 +179,8 @@ def postprocess_qa_predictions(
             predictions.append(min_null_prediction)
 
         # Use the offsets to gather the answer text in the original context.
-        context = example["context"]
+        # context = example["context"]
+        context = hf_data["id" == example["id"]]["context"]
         for pred in predictions:
             offsets = pred.pop("offsets")
             pred["text"] = context[offsets[0] : offsets[1]]

@@ -16,7 +16,7 @@ from sklearn.svm import LinearSVC
 from torch.utils.data import Dataset, Subset
 from tqdm import tqdm
 from transformers import TrainingArguments, IntervalStrategy, Trainer, BatchEncoding, AutoModelForQuestionAnswering, \
-    AutoModelForSequenceClassification
+    AutoModelForSequenceClassification, EvalPrediction
 from transformers.integrations import TensorBoardCallback
 import seaborn as sns
 from transformers.modeling_outputs import SequenceClassifierOutput, QuestionAnsweringModelOutput
@@ -81,16 +81,16 @@ class AnswerLengthPredictor(torch.nn.Module):
         return alp_outputs, qa_outputs
 
 
-def compute_metrics(eval_preds) -> dict:
-    logits, labels = eval_preds  # logits: alp_logits, qa_start_logits, qa_end_logits
+def compute_metrics(eval_preds: EvalPrediction) -> dict:
+    predictions, labels = eval_preds  # logits: alp_logits, qa_start_logits, qa_end_logits
     if Config.is_alp:
-        logits = logits[0]
+        predictions = predictions[0]
     metric = load_metric("squad_v2")  # load_metric("accuracy")
-    predictions = np.argmax(logits, axis=-1)
     # restrict the number of labels to the actual number of predictions
     # true_labels = np.argmax(labels, axis=-1)[:len(predictions)]
     ret_val: dict = metric.compute(predictions=predictions, references=labels)
     # ret_val["rmse"] = mean_squared_error(true_labels, predictions, squared=False)
+    print(ret_val)
     return ret_val
     # return dict(rmse=mean_squared_error(labels, logits, squared=False))
 

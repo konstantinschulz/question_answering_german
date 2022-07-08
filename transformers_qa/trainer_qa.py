@@ -15,7 +15,7 @@
 """
 A subclass of `Trainer` specific to Question-Answering tasks
 """
-
+from datasets import Dataset
 from transformers import Trainer, is_torch_tpu_available
 from transformers.trainer_utils import PredictionOutput
 
@@ -26,9 +26,10 @@ if is_torch_tpu_available():
 
 
 class QuestionAnsweringTrainer(Trainer):
-    def __init__(self, *args, eval_examples=None, post_process_function=None, **kwargs):
+    def __init__(self, *args, eval_examples=None, post_process_function=None, hf_data=None, **kwargs):
         super().__init__(*args, **kwargs)
         self.eval_examples = eval_examples
+        self.hf_data: Dataset = hf_data
         self.post_process_function = post_process_function
 
     def evaluate(self, eval_dataset=None, eval_examples=None, ignore_keys=None, metric_key_prefix: str = "eval"):
@@ -53,7 +54,7 @@ class QuestionAnsweringTrainer(Trainer):
             self.compute_metrics = compute_metrics
 
         if self.post_process_function is not None and self.compute_metrics is not None:
-            eval_preds = self.post_process_function(eval_examples, eval_dataset, output.predictions)
+            eval_preds = self.post_process_function(eval_examples, eval_dataset, output.predictions, self.hf_data)
             metrics = self.compute_metrics(eval_preds)
 
             # Prefix all keys with metric_key_prefix + '_'

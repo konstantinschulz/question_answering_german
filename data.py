@@ -25,36 +25,7 @@ class DataItem:
         self.question: str = question
 
     def get_position_indices(self) -> Tuple[torch.Tensor, torch.Tensor]:
-        token_ids: torch.Tensor = Config.tokenizer().encode(self.context, return_tensors=TensorType.PYTORCH)
-        answer_ids: torch.Tensor = Config.tokenizer().encode(self.answers_true[0], return_tensors=TensorType.PYTORCH)
-        start_idx, end_idx = find_sub_list(answer_ids[0], token_ids[0])
-        if not start_idx:
-            for answer in self.answers_true:
-                if start_idx:
-                        break
-                start_idx_in_string: int = self.context.find(answer)
-                while start_idx_in_string >= 0:
-                    last_char_idx: int = start_idx_in_string + len(answer)
-                    is_answer_last: bool = last_char_idx == len(self.context)
-                    for i in range(2):  # number of chars
-                        if start_idx:
-                            break
-                        for j in range(2): # forward/backward
-                            if start_idx:
-                                break
-                            if is_answer_last and not j:
-                                continue
-                            new_start_idx: int = (start_idx_in_string - i - 1) if j else start_idx_in_string
-                            new_end_idx: int = last_char_idx if j else (last_char_idx + i + 1)
-                            new_answer: str = self.context[new_start_idx:new_end_idx]
-                            answer_ids = Config.tokenizer().encode(new_answer, return_tensors=TensorType.PYTORCH)
-                            start_idx, end_idx = find_sub_list(answer_ids[0], token_ids[0])
-                    start_idx_in_string = self.context.find(answer, start_idx_in_string + 1)
-        if not start_idx:
-            print(f"Answer not found: {self.answers_true[0]} || Question: {self.question}")
-        start: torch.Tensor = torch.tensor([start_idx], dtype=torch.long)
-        end: torch.Tensor = torch.tensor([end_idx], dtype=torch.long)
-        return start, end
+        return get_position_indices(self.context, self.answers_true, self.question)
 
 
 class GermanQuADdataset(Dataset):
@@ -92,7 +63,7 @@ class GermanQuADdataset(Dataset):
         start_position, end_position = data_item.get_position_indices()
         encodings.data["start_positions"] = start_position
         encodings.data["end_positions"] = end_position
-        encodings.data = {k: v.to(Config.device) for k,v in encodings.data.items()}
+        encodings.data = {k: v.to(Config.device) for k, v in encodings.data.items()}
         encodings.data["question_indices"] = torch.tensor([idx])
         return encodings
 
@@ -141,6 +112,48 @@ def get_data_items(dataset_path: str) -> list[DataItem]:
                 dis[-1].answers_true.append(answer_text.strip())
                 dis[-1].answer_categories.append(answer["answer_category"])
     return dis
+
+
+def get_position_indices(context: str, answers_true: list[str], question: str) -> Tuple[torch.Tensor, torch.Tensor]:
+    token_ids: torch.Tensor = Config.tokenizer().encode(context, return_tensors=TensorType.PYTORCH)
+    answer_ids: torch.Tensor = Config.tokenizer().encode(answers_true[0], return_tensors=TensorType.PYTORCH)
+    start_idx, end_idx = find_sub_list(answer_ids[0], token_ids[0])
+    if not start_idx:
+        # fix trailing whitespace
+        answers_true = [x.strip() for x in answers_true]
+        for answer in answers_true:
+            if start_idx:
+                break
+            start_idx_in_string: int = context.find(answer)
+            while start_idx_in_string >= 0:
+                last_char_idx: int = start_idx_in_string + len(answer)
+                is_answer_last: bool = last_char_idx == len(context)
+                for i in range(2):  # number of chars
+                    if start_idx:
+                        break
+                    for j in range(2):  # forward/backward
+                        if start_idx:
+                            break
+                        if is_answer_last and not j:
+                            continue
+                        new_start_idx: int = (start_idx_in_string - i - 1) if j else start_idx_in_string
+                        new_end_idx: int = last_char_idx if j else (last_char_idx + i + 1)
+                        new_answer: str = context[new_start_idx:new_end_idx]
+                        answer_ids = Config.tokenizer().encode(new_answer, return_tensors=TensorType.PYTORCH)
+                        start_idx, end_idx = find_sub_list(answer_ids[0], token_ids[0])
+                start_idx_in_string = context.find(answer, start_idx_in_string + 1)
+            if not start_idx:
+                # try adding characters both at start and end
+                start_idx_in_string = context.find(answer) - 1
+                last_char_idx = start_idx_in_string + len(answer) + 2
+                new_answer = context[start_idx_in_string:last_char_idx]
+                answer_ids = Config.tokenizer().encode(new_answer, return_tensors=TensorType.PYTORCH)
+                start_idx, end_idx = find_sub_list(answer_ids[0], token_ids[0])
+    if not start_idx:
+        print(f"Answer not found: {answers_true[0]} || Question: {question}")
+    start: torch.Tensor = torch.tensor([start_idx], dtype=torch.long)
+    end: torch.Tensor = torch.tensor([end_idx], dtype=torch.long)
+    return start, end
 
 
 def get_question_type(question: str) -> QuestionType:

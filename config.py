@@ -14,14 +14,14 @@ class Config:
     classifier_path: str = os.path.join(models_dir, "linear_svc_classifier.pickle")
     cv: CountVectorizer = CountVectorizer()
     dataset_dir: str = os.path.abspath("GermanQuAD")
-    # device: torch.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    device: torch.device = torch.device("cpu")
+    device: torch.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    # device: torch.device = torch.device("cpu")
     germanquad_test_path: str = os.path.join(dataset_dir, "GermanQuAD_test.json")
     germanquad_train_path: str = os.path.join(dataset_dir, "GermanQuAD_train.json")
     is_alp: bool = False
     kbd: KBinsDiscretizer
     max_length: int = 1024  # 512 2048
-    model_name: str = "malteos/gpt2-wechsel-german-ds-meg"
+    model_name: str = "malteos/gpt2-xl-wechsel-german"  # malteos/gpt2-wechsel-german-ds-meg
     # deepset/gelectra-large-germanquad facebook/xglm-564M deepset/gelectra-large deepset/gelectra-base
     model_path: str = "checkpoint-32"  # os.path.join(models_dir, "model.pt")
     num_labels: int = max_length  # 1 2 270

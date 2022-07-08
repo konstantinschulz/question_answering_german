@@ -5,3 +5,4 @@ event_kg/
 wikidata/
 input/
 runs/
+checkpoint-*

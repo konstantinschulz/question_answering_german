@@ -1,0 +1,88 @@
+{
+    "40373": [
+        {
+            "start_logit": 60.614463806152344,
+            "end_logit": 80.26494598388672,
+            "text": "r Anb",
+            "probability": 1.0
+        }
+    ],
+    "40366": [
+        {
+            "text": "empty",
+            "start_logit": 0.0,
+            "end_logit": 0.0,
+            "probability": 1.0
+        }
+    ],
+    "40369": [
+        {
+            "text": "empty",
+            "start_logit": 0.0,
+            "end_logit": 0.0,
+            "probability": 1.0
+        }
+    ],
+    "40370": [
+        {
+            "start_logit": 60.38471984863281,
+            "end_logit": 80.12184143066406,
+            "text": "Pro",
+            "probability": 1.0
+        }
+    ],
+    "40376": [
+        {
+            "start_logit": 60.57366943359375,
+            "end_logit": 80.28460693359375,
+            "text": "Ra",
+            "probability": 1.0
+        }
+    ],
+    "40367": [
+        {
+            "text": "empty",
+            "start_logit": 0.0,
+            "end_logit": 0.0,
+            "probability": 9.037310156433792e-62
+        },
+        {
+            "start_logit": 60.384525299072266,
+            "end_logit": 80.17439270019531,
+            "text": "",
+            "probability": 1.0
+        }
+    ],
+    "40374": [
+        {
+            "start_logit": 60.61446762084961,
+            "end_logit": 80.26495361328125,
+            "text": "r Anb",
+            "probability": 1.0
+        }
+    ],
+    "40375": [
+        {
+            "start_logit": 60.64048767089844,
+            "end_logit": 80.34086608886719,
+            "text": "Raps un",
+            "probability": 1.0
+        }
+    ],
+    "40372": [
+        {
+            "start_logit": 60.651611328125,
+            "end_logit": 80.36320495605469,
+            "text": "nd Seid",
+            "probability": 1.0
+        }
+    ],
+    "40368": [
+        {
+            "start_logit": 60.40248107910156,
+            "end_logit": 80.15508270263672,
+            "text": "nefl",
+            "probability": 1.0
+        }
+    ]
+}
