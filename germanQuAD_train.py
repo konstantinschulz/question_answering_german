@@ -229,13 +229,14 @@ def train_gpt2():
                                                 remove_columns=train_dataset.column_names)
     model: GPT2ForQuestionAnswering = GPT2ForQuestionAnswering.from_pretrained(Config.model_name)
     data_collator: DefaultDataCollator = DefaultDataCollator()
+    experiment_data_dir: str = os.path.abspath("./exp")  # checkpoints
     train_args: TrainingArguments = TrainingArguments(
-        output_dir=".", dataloader_pin_memory=False, logging_steps=eval_steps, logging_strategy=IntervalStrategy.STEPS,
-        evaluation_strategy=IntervalStrategy.STEPS, eval_steps=eval_steps, per_device_train_batch_size=batch_size,
-        per_device_eval_batch_size=eval_batch_size, num_train_epochs=1, save_strategy=IntervalStrategy.STEPS,
-        save_steps=eval_steps, gradient_accumulation_steps=accumulation_steps, seed=42, warmup_steps=60,
-        no_cuda=Config.device == torch.device("cpu"), save_total_limit=3, learning_rate=1e-1,
-        label_names=["start_positions", "end_positions"], remove_unused_columns=False)  #
+        output_dir=experiment_data_dir, dataloader_pin_memory=False, logging_steps=eval_steps,
+        logging_strategy=IntervalStrategy.STEPS, evaluation_strategy=IntervalStrategy.STEPS, eval_steps=eval_steps,
+        per_device_train_batch_size=batch_size, per_device_eval_batch_size=eval_batch_size, num_train_epochs=1,
+        save_strategy=IntervalStrategy.STEPS, save_steps=eval_steps, gradient_accumulation_steps=accumulation_steps,
+        seed=42, warmup_steps=60, no_cuda=Config.device == torch.device("cpu"), save_total_limit=3, learning_rate=1e-1,
+        label_names=["start_positions", "end_positions"], remove_unused_columns=False)
     # 4e-3 OptimizerNames.ADAFACTOR optim=OptimizerNames.ADAMW_HF, lr_scheduler_type=SchedulerType.COSINE_WITH_RESTARTS,
     trainer: Trainer = QuestionAnsweringTrainer(
         model=model, args=train_args, train_dataset=tokenized_train_dataset, callbacks=[TensorBoardCallback],
