@@ -12,4 +12,4 @@ srun --container-image=$ENROOT_DIR/$BASE_IMAGE \
   --container-workdir="`pwd`" \
   --container-mounts=$NETSCRATCH:$NETSCRATCH,/ds:/ds:ro,"`pwd`":"`pwd`" \
   --container-save=$NETSCRATCH/docker_images/$BASE_IMAGE \
-  ./env.sh && pip install -r --no-cache-dir requirements.txt && python germanQuAD_train.py
+  ./env.sh && pip3 install -r --no-cache-dir requirements.txt && python germanQuAD_train.py
