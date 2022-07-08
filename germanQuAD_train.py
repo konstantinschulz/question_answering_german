@@ -229,7 +229,9 @@ def train_gpt2():
                                                 remove_columns=train_dataset.column_names)
     model: GPT2ForQuestionAnswering = GPT2ForQuestionAnswering.from_pretrained(Config.model_name)
     data_collator: DefaultDataCollator = DefaultDataCollator()
-    experiment_data_dir: str = os.path.abspath("./exp")  # checkpoints
+    experiment_data_dir: str = os.path.abspath("./exp")
+    # use env vars by default
+    experiment_data_dir = os.environ.get("DATADIR", experiment_data_dir)
     train_args: TrainingArguments = TrainingArguments(
         output_dir=experiment_data_dir, dataloader_pin_memory=False, logging_steps=eval_steps,
         logging_strategy=IntervalStrategy.STEPS, evaluation_strategy=IntervalStrategy.STEPS, eval_steps=eval_steps,
